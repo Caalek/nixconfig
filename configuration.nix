@@ -1,4 +1,4 @@
-{ config, pkgs, username, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -54,9 +54,9 @@
   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
   services.syncthing = {
     enable = true;
-    user = username;
-    dataDir = "/home/${username}";
-    configDir = "/home/${username}/.config/syncthing";
+    user = "user";
+    dataDir = "/home/user";
+    configDir = "/home/user/.config/syncthing";
   };
   services.flatpak.enable = true;
 
@@ -77,7 +77,7 @@
 
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
-      if (action.id == "org.libvirt.unix.manage" && subject.user == "${username}")
+      if (action.id == "org.libvirt.unix.manage" && subject.user == "user")
         return polkit.Result.YES;
     });
   '';
@@ -117,10 +117,10 @@
     gnomeExtensions.tiling-shell
   ];
 
-  users.users.${username} = {
+  users.users.user = {
     isNormalUser = true;
     shell = pkgs.fish;
-    description = username;
+    description = "user";
     extraGroups = [ "networkmanager" "wheel" "wireshark" "libvirtd" "docker" "adbusers" ];
   };
 

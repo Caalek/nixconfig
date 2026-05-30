@@ -1,8 +1,8 @@
-{ pkgs, username, ... }:
+{ pkgs, ... }:
 
 {
-  home.username = username;
-  home.homeDirectory = "/home/${username}";
+  home.username = "user";
+  home.homeDirectory = "/home/user";
   home.stateVersion = "25.11";
 
   xdg.configFile."fish/conf.d/00-hush.fish".text = "set -g fish_greeting \"\"\n";

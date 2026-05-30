@@ -35,14 +35,6 @@ sudo ln -s ~/nixconfig /etc/nixos
 sudo nixos-rebuild switch --flake /etc/nixos#nixos
 ```
 
-## Username
-
-The config auto-detects your username from the `$USER` environment variable. Falls back to `vm` if unset or root. To override explicitly, run:
-
-```bash
-USER=myuser sudo nixos-rebuild switch --flake /etc/nixos#nixos
-```
-
 ## Daily Use
 
 ```bash
