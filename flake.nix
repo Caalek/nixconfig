@@ -18,6 +18,17 @@
       opencode = llm-agents.packages.${system}.opencode;
       pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
         inherit opencode;
+        terraform-bin = prev.stdenv.mkDerivation rec {
+          pname = "terraform";
+          version = "1.14.8";
+          src = prev.fetchzip {
+            url = "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip";
+            hash = "sha256-UtvobU47BSkZLJOHZ61pLIFyBb9n7w9t0wS03GR41vg=";
+            stripRoot = false;
+          };
+          installPhase = "install -Dm755 terraform $out/bin/terraform";
+          meta.platforms = prev.lib.platforms.linux;
+        };
       });
     in {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
@@ -32,7 +43,20 @@
             home-manager.backupFileExtension = "backup";
             home-manager.users.user = import ./home.nix;
 
-            nixpkgs.overlays = [ (final: prev: { inherit opencode; }) ];
+            nixpkgs.overlays = [ (final: prev: {
+              inherit opencode;
+              terraform-bin = prev.stdenv.mkDerivation rec {
+                pname = "terraform";
+                version = "1.14.8";
+                src = prev.fetchzip {
+                  url = "https://releases.hashicorp.com/terraform/${version}/terraform_${version}_linux_amd64.zip";
+                  hash = "sha256-UtvobU47BSkZLJOHZ61pLIFyBb9n7w9t0wS03GR41vg=";
+                  stripRoot = false;
+                };
+                installPhase = "install -Dm755 terraform $out/bin/terraform";
+                meta.platforms = prev.lib.platforms.linux;
+              };
+            }) ];
           }
         ];
       };

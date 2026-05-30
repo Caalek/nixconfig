@@ -4,6 +4,7 @@
   imports = [ ./hardware-configuration.nix ];
 
   boot.loader.systemd-boot.enable = true;
+  boot.loader.systemd-boot.configurationLimit = 1;
   boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_zen;
   boot.supportedFilesystems = [ "btrfs" ];
@@ -38,7 +39,7 @@
   environment.gnome.excludePackages = with pkgs; [
     baobab cheese epiphany geary gnome-characters gnome-clocks
     gnome-console gnome-connections gnome-contacts gnome-logs
-    gnome-maps gnome-music gnome-photos gnome-tour gnome-weather
+    gnome-maps gnome-music gnome-photos gnome-software gnome-tour gnome-weather
     loupe rhythmbox simple-scan snapshot totem
   ];
 
@@ -61,6 +62,7 @@
   systemd.services.flatpak-add-flathub = {
     description = "Add Flathub remote";
     wantedBy = [ "multi-user.target" ];
+    wants = [ "network-online.target" ];
     after = [ "network-online.target" ];
     script = ''
       ${pkgs.flatpak}/bin/flatpak remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -95,9 +97,42 @@
   programs.firefox = {
     enable = true;
     policies = {
+      DisableTelemetry = true;
+      DisableFirefoxStudies = true;
+      DisablePocket = true;
+      DisableFirefoxAccounts = true;
+      SearchEngines = {
+        Default = "DuckDuckGo";
+        PreventInstalls = false;
+      };
+      ExtensionSettings = {
+        "uBlock0@raymondhill.net" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+          toolbar_pin = "never_pinned";
+        };
+        "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+          toolbar_pin = "force_pinned";
+        };
+        "myallychou@gmail.com" = {
+          installation_mode = "force_installed";
+          install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
+          toolbar_pin = "never_pinned";
+        };
+      };
       Preferences = {
         "sidebar.revamp" = { Value = true; Status = "locked"; };
         "sidebar.verticalTabs" = { Value = true; Status = "locked"; };
+        "browser.ml.enable" = { Value = false; Status = "locked"; };
+        "browser.ml.chat.enabled" = { Value = false; Status = "locked"; };
+        "browser.newtabpage.activity-stream.showSponsored" = { Value = false; Status = "locked"; };
+        "browser.newtabpage.activity-stream.showSponsoredTopSites" = { Value = false; Status = "locked"; };
+        "browser.newtabpage.activity-stream.feeds.section.topstories" = { Value = false; Status = "locked"; };
+        "browser.newtabpage.activity-stream.feeds.snippets" = { Value = false; Status = "locked"; };
+        "browser.urlbar.suggest.sponsored" = { Value = false; Status = "locked"; };
+        "browser.urlbar.quicksuggest.sponsored" = { Value = false; Status = "locked"; };
       };
     };
   };
@@ -106,13 +141,17 @@
 
   qt.enable = true;
   qt.platformTheme = "gnome";
-  qt.style = "adwaita";
+  qt.style = "adwaita-dark";
 
   environment.systemPackages = with pkgs; [
     adw-gtk3
+    git
     gnomeExtensions.appindicator
     gnomeExtensions.syncthing-indicator
     gnomeExtensions.tiling-shell
+    htop
+    mcp-nixos
+    vim
   ];
 
   users.users.user = {
@@ -127,6 +166,14 @@
   hardware.nvidia.powerManagement.enable = true;
   hardware.nvidia.prime.offload.enable = true;
   hardware.nvidia.open = true;
+
+  nix.gc = {
+    automatic = true;
+    dates = "daily";
+    options = "--delete-older-than 1d";
+  };
+  nix.settings.keep-outputs = false;
+  nix.settings.keep-derivations = false;
 
   system.stateVersion = "25.11";
 }
