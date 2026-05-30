@@ -3,6 +3,9 @@
 {
   imports = [ ./hardware-configuration.nix ];
 
+  boot.loader.grub.enable = true;
+  boot.loader.grub.efiSupport = true;
+  boot.loader.efi.canTouchEfiVariables = true;
   boot.kernelPackages = pkgs.linuxPackages_zen;
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "sr_mod" "virtio_blk" ];
