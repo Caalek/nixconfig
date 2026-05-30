@@ -10,15 +10,12 @@
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
     };
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
   };
 
-  outputs = { nixpkgs, home-manager, llm-agents, agenix, ... }:
+  outputs = { nixpkgs, home-manager, llm-agents, ... }:
     let
       system = "x86_64-linux";
+      username = let u = builtins.getEnv "USER"; in if u != "" && u != "root" then u else "vm";
       opencode = llm-agents.packages.${system}.opencode;
       pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
         inherit opencode;
@@ -26,25 +23,31 @@
     in {
       nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
         inherit system;
+        specialArgs = { inherit username; };
         modules = [
           ./configuration.nix
           ./hardware-configuration.nix
-          agenix.nixosModules.age
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.backupFileExtension = "backup";
-            home-manager.users.vm = import ./home.nix;
+            home-manager.users.${username} = import ./home.nix;
 
             nixpkgs.overlays = [ (final: prev: { inherit opencode; }) ];
           }
         ];
       };
 
-      homeConfigurations.vm = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations.${username} = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
-        modules = [ ./home.nix ];
+        modules = [
+          ({ pkgs, ... }: {
+            home.username = username;
+            home.homeDirectory = "/home/${username}";
+          })
+          ./home.nix
+        ];
       };
     };
 }

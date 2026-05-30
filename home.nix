@@ -1,14 +1,25 @@
-{ pkgs, ... }:
+{ pkgs, username, ... }:
 
 {
-  home.username = "vm";
-  home.homeDirectory = "/home/vm";
+  home.username = username;
+  home.homeDirectory = "/home/${username}";
   home.stateVersion = "25.11";
 
   xdg.configFile."fish/conf.d/00-hush.fish".text = "set -g fish_greeting \"\"\n";
   xdg.configFile."fish/conf.d/99-fzf.fish".text = "fzf --fish | source\n";
 
   programs.direnv.enable = true;
+
+  programs.alacritty = {
+    enable = true;
+    settings = {
+      font.size = 11;
+      font.normal.family = "JetBrainsMono Nerd Font";
+      font.bold.family = "JetBrainsMono Nerd Font";
+      font.italic.family = "JetBrainsMono Nerd Font";
+      font.bold_italic.family = "JetBrainsMono Nerd Font";
+    };
+  };
 
   programs.vscode = {
     enable = true;
@@ -55,7 +66,7 @@
   };
 
   home.packages = with pkgs; [
-    alacritty ansible awscli2 azure-cli
+    ansible awscli2 azure-cli
     btop bun cargo chromium curl discord element-desktop
     fastfetch fzf git gnome-extension-manager
     go google-cloud-sdk hcloud htop k9s

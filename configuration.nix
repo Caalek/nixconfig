@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, username, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -54,9 +54,9 @@
   services.fprintd.tod.driver = pkgs.libfprint-2-tod1-goodix;
   services.syncthing = {
     enable = true;
-    user = "vm";
-    dataDir = "/home/vm";
-    configDir = "/home/vm/.config/syncthing";
+    user = username;
+    dataDir = "/home/${username}";
+    configDir = "/home/${username}/.config/syncthing";
   };
   services.flatpak.enable = true;
 
@@ -77,12 +77,20 @@
 
   security.polkit.extraConfig = ''
     polkit.addRule(function(action, subject) {
-      if (action.id == "org.libvirt.unix.manage" && subject.user == "vm")
+      if (action.id == "org.libvirt.unix.manage" && subject.user == "${username}")
         return polkit.Result.YES;
     });
   '';
 
-  fonts.packages = with pkgs; [ jetbrains-mono nerd-fonts.jetbrains-mono ];
+  fonts.packages = with pkgs; [
+    liberation_ttf
+    carlito
+    caladea
+    noto-fonts
+    noto-fonts-color-emoji
+    jetbrains-mono
+    nerd-fonts.jetbrains-mono
+  ];
   fonts.fontconfig.defaultFonts.monospace = [ "JetBrainsMono Nerd Font" ];
 
   programs.fish.enable = true;
@@ -109,30 +117,10 @@
     gnomeExtensions.tiling-shell
   ];
 
-  age.identityPaths = [ "/etc/age/key.txt" ];
-
-  age.secrets.borg-passphrase = {
-    file = ./secrets/borg-passphrase.age;
-    owner = "root";
-    group = "root";
-  };
-
-  services.borgbackup.jobs."daily" = {
-    paths = [ "/etc" "/home/vm" ];
-    repo = "/var/backup/borg";
-    encryption = {
-      mode = "repokey-blake2";
-      passCommand = "cat ${config.age.secrets.borg-passphrase.path}";
-    };
-    doInit = true;
-    startAt = "daily";
-    compression = "zstd,3";
-  };
-
-  users.users.vm = {
+  users.users.${username} = {
     isNormalUser = true;
     shell = pkgs.fish;
-    description = "vm";
+    description = username;
     extraGroups = [ "networkmanager" "wheel" "wireshark" "libvirtd" "docker" "adbusers" ];
   };
 
