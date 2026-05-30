@@ -14,7 +14,7 @@
   programs.alacritty = {
     enable = true;
     settings = {
-      font.size = 11;
+      font.size = 15;
       font.normal.family = "JetBrainsMono Nerd Font";
       font.bold.family = "JetBrainsMono Nerd Font";
       font.italic.family = "JetBrainsMono Nerd Font";
@@ -75,18 +75,22 @@
   };
 
   home.packages = with pkgs; [
-    android-studio ansible awscli2 azure-cli
+    android-studio ansible asunder awscli2 authenticator azure-cli bitwarden-cli
     btop bun burpsuite cargo chromium curl discord element-desktop
     fastfetch fzf git gnome-extension-manager
-    go google-cloud-sdk hcloud htop k9s
-    kubectl kubectx kubernetes-helm libreoffice-fresh localsend mariadb mediawriter
-    mpv neovim nextcloud-client nodejs obsidian obs-studio onlyoffice-desktopeditors
-    openconnect pciutils planify pnpm postgresql prismlauncher python313 python313Packages.pip
+    go godot google-cloud-sdk gpick hcloud htop jellyfin-desktop k9s
+    kubectl kubectx kubernetes-helm libreoffice-fresh localsend makemkv mariadb mediawriter
+    mpv neovim nextcloud-client nvtopPackages.full nodejs obsidian obs-studio onlyoffice-desktopeditors opencode
+    openconnect pciutils pgadmin4 pi planify pnpm postgresql prismlauncher python313 python313Packages.pip
     qbittorrent rustc signal-desktop solaar teams-for-linux
-    telegram-desktop usbutils
-    snicat sshpass talosctl terraform-bin uv vim virt-manager vscode wget wireguard-tools yarn yazi zellij
-    opencode
+    telegram-desktop thunderbird usbutils
+    snicat sshpass talosctl terraform-bin uv virt-manager vscode wget wireguard-tools wireshark yarn yazi zellij
   ];
+
+  programs.vim = {
+    enable = true;
+    extraConfig = "set number";
+  };
 
   programs.vscode = {
     enable = true;

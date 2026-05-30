@@ -4,9 +4,8 @@
   imports = [ ./hardware-configuration.nix ];
 
   boot.loader.systemd-boot.enable = true;
-  boot.loader.systemd-boot.configurationLimit = 1;
+  boot.loader.systemd-boot.configurationLimit = 3;
   boot.loader.efi.canTouchEfiVariables = true;
-  boot.kernelPackages = pkgs.linuxPackages_zen;
   boot.supportedFilesystems = [ "btrfs" ];
   boot.initrd.availableKernelModules = [ "ahci" "xhci_pci" "virtio_pci" "sr_mod" "virtio_blk" ];
   boot.kernelModules = [ "kvm-amd" ];
@@ -94,6 +93,12 @@
   fonts.fontconfig.defaultFonts.monospace = [ "JetBrainsMono Nerd Font" ];
 
   programs.fish.enable = true;
+  programs.git = {
+    enable = true;
+    config = {
+      safe.directory = [ "/etc/nixos" "/home/user/.config/nix" ];
+    };
+  };
   programs.firefox = {
     enable = true;
     policies = {
@@ -137,7 +142,35 @@
     };
   };
   programs.dconf.enable = true;
-  programs.nix-ld.enable = true;
+  programs.wireshark.enable = true;
+  programs.nix-ld = {
+    enable = true;
+    libraries = with pkgs; [
+      stdenv.cc.cc.lib
+      zlib
+      zstd
+      openssl
+      curl
+      util-linux
+      glib
+      libGL
+      alsa-lib
+      libpulseaudio
+      sqlite
+      xz
+      bzip2
+      libffi
+      ncurses
+      readline
+      gmp
+      libcap
+      expat
+      libpng
+      freetype
+      fontconfig
+      dbus
+    ];
+  };
 
   qt.enable = true;
   qt.platformTheme = "gnome";
@@ -145,12 +178,16 @@
 
   environment.systemPackages = with pkgs; [
     adw-gtk3
+    gcc
     git
     gnomeExtensions.appindicator
     gnomeExtensions.syncthing-indicator
     gnomeExtensions.tiling-shell
+    gdu
     htop
     mcp-nixos
+    psmisc
+    snicat
     vim
   ];
 
@@ -170,10 +207,29 @@
   nix.gc = {
     automatic = true;
     dates = "daily";
-    options = "--delete-older-than 1d";
+    options = "--delete-older-than 7d";
   };
   nix.settings.keep-outputs = false;
   nix.settings.keep-derivations = false;
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  system.autoUpgrade = {
+    enable = true;
+    flake = "/home/user/.config/nix";
+    flags = [
+      "--print-build-logs"
+      "--commit-lock-file"
+    ];
+    dates = "0/6:00";
+    randomizedDelaySec = "15min";
+  };
+
+  systemd.services.nixos-upgrade.environment = {
+    GIT_AUTHOR_NAME = "NixOS Auto-upgrade";
+    GIT_AUTHOR_EMAIL = "root@nixos";
+    GIT_COMMITTER_NAME = "NixOS Auto-upgrade";
+    GIT_COMMITTER_EMAIL = "root@nixos";
+  };
 
   system.stateVersion = "25.11";
 }

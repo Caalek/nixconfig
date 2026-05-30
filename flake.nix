@@ -16,8 +16,9 @@
     let
       system = "x86_64-linux";
       opencode = llm-agents.packages.${system}.opencode;
+      pi = llm-agents.packages.${system}.pi;
       pkgs = nixpkgs.legacyPackages.${system}.extend (final: prev: {
-        inherit opencode;
+        inherit opencode pi;
         terraform-bin = prev.stdenv.mkDerivation rec {
           pname = "terraform";
           version = "1.14.8";
@@ -28,6 +29,23 @@
           };
           installPhase = "install -Dm755 terraform $out/bin/terraform";
           meta.platforms = prev.lib.platforms.linux;
+        };
+        snicat = prev.buildGoModule rec {
+          pname = "snicat";
+          version = "0.0.2";
+          src = prev.fetchFromGitHub {
+            owner = "CTFd";
+            repo = "snicat";
+            rev = "${version}";
+            hash = "sha256-BTNqSVLrAWodgOKd569RGJ5QWdFillUOkCaf/fojZV8=";
+          };
+          vendorHash = "sha256-f2fzJAnGRyfBgM2tNXOVurDdfdLzH7QbE8UQ3p4tShg=";
+          meta = with prev.lib; {
+            description = "TLS & SNI aware netcat";
+            homepage = "https://github.com/CTFd/snicat";
+            license = licenses.asl20;
+            mainProgram = "snicat";
+          };
         };
       });
     in {
@@ -44,7 +62,7 @@
             home-manager.users.user = import ./home.nix;
 
             nixpkgs.overlays = [ (final: prev: {
-              inherit opencode;
+              inherit opencode pi;
               terraform-bin = prev.stdenv.mkDerivation rec {
                 pname = "terraform";
                 version = "1.14.8";
@@ -55,6 +73,23 @@
                 };
                 installPhase = "install -Dm755 terraform $out/bin/terraform";
                 meta.platforms = prev.lib.platforms.linux;
+              };
+              snicat = prev.buildGoModule rec {
+                pname = "snicat";
+                version = "0.0.2";
+                src = prev.fetchFromGitHub {
+                  owner = "CTFd";
+                  repo = "snicat";
+                  rev = "${version}";
+                  hash = "sha256-BTNqSVLrAWodgOKd569RGJ5QWdFillUOkCaf/fojZV8=";
+                };
+                vendorHash = "sha256-f2fzJAnGRyfBgM2tNXOVurDdfdLzH7QbE8UQ3p4tShg=";
+                meta = with prev.lib; {
+                  description = "TLS & SNI aware netcat";
+                  homepage = "https://github.com/CTFd/snicat";
+                  license = licenses.asl20;
+                  mainProgram = "snicat";
+                };
               };
             }) ];
           }
