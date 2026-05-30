@@ -74,7 +74,7 @@
     mpv neovim nextcloud-client nodejs obsidian obs-studio
     openconnect pciutils planify pnpm python313 python313Packages.pip
     qbittorrent rustc rustdesk signal-desktop solaar teams-for-linux
-    telegram-desktop terraform texlive.combined.scheme-full usbutils
+    telegram-desktop terraform usbutils
     snicat sshpass uv vim virt-manager wget wireguard-tools yarn zellij
     opencode
   ];
