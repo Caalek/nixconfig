@@ -75,7 +75,7 @@
   };
 
   home.packages = with pkgs; [
-    android-studio ansible asunder awscli2 authenticator azure-cli bitwarden-cli
+    ansible asunder awscli2 authenticator azure-cli bitwarden-cli
     btop bun burpsuite cargo chromium curl discord element-desktop
     fastfetch fzf git gnome-extension-manager
     go godot google-cloud-sdk gpick hcloud htop jellyfin-desktop k9s
